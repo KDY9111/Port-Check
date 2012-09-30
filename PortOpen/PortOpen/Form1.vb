@@ -4,8 +4,7 @@ Imports System.IO
 
 Public Class Form1
     Public Function IsProcessRunning(name As String) As Boolean
-        'here we're going to get a list of all running processes on
-        'the computer
+        'here we're going to get a list of all running processes on the computer
         For Each clsProcess As Process In Process.GetProcesses()
             If clsProcess.ProcessName.StartsWith(name) Then
                 'process found so it's running so return true
@@ -30,36 +29,48 @@ Public Class Form1
         Catch ex As Exception
             Return False
         End Try
+        Return False
     End Function
     Private Sub Timer1_Tick(sender As System.Object, e As System.EventArgs) Handles Timer1.Tick
-        If IsProcessRunning(TextBox4.Text) Then
-        Else
-            Try
-                Process.Start(TextBox3.Text)
-            Catch ex As Exception
-            End Try
-        End If
-        Dim port1 As Integer = TextBox2.Text
-        Dim port2 As Integer = TextBox2.Text
-        For i = port1 To port2
-            ListBox1.Items.Add("Port " & i & " Connected Status: " & (ScanPort(TextBox1.Text, i)))
-        Next
+            'If My.Computer.FileSystem.DirectoryExists(TextBox3.Text) Then
+            '    MsgBox("Found file location starting")
+            'Else
+            '    'Else try this
+            '    MsgBox("Could not find file location: " & TextBox3.Text)
+            'End If
+            Dim port1 As Integer = TextBox2.Text
+            Dim port2 As Integer = TextBox2.Text
+            For i = port1 To port2
+                ListBox1.Items.Add("Port " & i & " Connected Status: " & (ScanPort(TextBox1.Text, i)))
+            Next
     End Sub
 
     Private Sub CheckToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles CheckToolStripMenuItem.Click
         Timer1.Start()
+        If Label1.Visible = False Then
+            Label1.Visible = True
+        End If
     End Sub
 
     Private Sub StopCheckToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles StopCheckToolStripMenuItem.Click
         Timer1.Stop()
-        Timer1.Interval = 30000
+        Timer1.Interval = 5000
         Label1.Text = Timer1.Interval
+        If Label1.Visible = True Then
+            Label1.Visible = False
+        End If
     End Sub
 
     Private Sub TimeCheckToolStripMenuItem_Click(sender As System.Object, e As System.EventArgs) Handles TimeCheckToolStripMenuItem.Click
         Timer1.Interval = InputBox("Change check time for each connect")
+        If Timer1.Interval < 5000 Then
+            Timer1.Interval = 5000
+            MsgBox("!Danger! Do not use anything lower than 5 seconds as your check time, new time set to: " & Timer1.Interval)
+        End If
         Label1.Text = Timer1.Interval
-        Label1.Visible = True
+        If Label1.Visible = False Then
+            Label1.Visible = True
+        End If
         MsgBox("Time Changed!")
     End Sub
 
@@ -72,8 +83,9 @@ Public Class Form1
         Me.TableTableAdapter.Fill(Me.SaveInfoDataSet1.Table)
         'TODO: This line of code loads data into the 'SaveInfoDataSet1.Table' table. You can move, or remove it, as needed.
         Me.TableTableAdapter.Fill(Me.SaveInfoDataSet1.Table)
-        Timer1.Interval = 30000
+        Timer1.Interval = 5000
         Label1.Text = Timer1.Interval
+        Label1.Visible = True
         'add a reference to the Microsoft WMI Scripting 1.2 library
         On Error Resume Next
         Dim getip As String = New WebClient().DownloadString("http://automation.whatismyip.com/n09230945.asp")
